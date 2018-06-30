@@ -1,0 +1,50 @@
+#include <Sodaq_RN2483.h>
+#include <Wire.h>
+#include <Sodaq_BMP085.h>
+#include <Sodaq_SHT2x.h>
+ 
+////SETTINGS///
+// MBili / Tatu
+//#define debugSerial Serial
+//#define beePin 20
+// Autonomo 
+#define debugSerial SerialUSB
+#define beePin BEE_VCC
+////END SETTINGS////
+// LoRaBEE
+#define loraSerial Serial1
+ 
+const uint8_t devAddr[4] =
+{
+	0x00, 0x00, 0x00, 0x00
+};
+// our keys
+const uint8_t appSKey[16] =
+{
+	76, 67, 75, 43, 84, 15, FB, F5, 59, 0E, 31, 7E, FB, 7F, 35, 04
+};
+
+const uint8_t nwkSKey[16] =
+{
+	52, 41, 85, 94, AC, EE, 98, 7C, 16, 00, 44, 0R, F3, 53, 72, 8B
+};
+//for sensor use
+Sodaq_BMP085 bmp;
+void setup()
+{
+  // REMOVE WHEN YOU DONT USE PC
+  while(!debugSerial);
+	debugSerial.begin(57600);
+	loraSerial.begin(LoRaBee.getDefaultBaudRate());
+        digitalWrite(beePin, HIGH);
+	LoRaBee.setDiag(debugSerial); // optional
+	if (LoRaBee.initABP(loraSerial, devAddr, appSKey, nwkSKey, true))
+	{
+		debugSerial.println("Connection to the network was successful.");
+	}
+	else
+	{
+		debugSerial.println("Connection to the network failed!");
+	}
+  //setupNAMEOFSENSOR(); here you enter the sensor you'll use
+}
